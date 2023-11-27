@@ -6,9 +6,10 @@ import org.slf4j.LoggerFactory;
 import io.smallrye.mutiny.Uni;
 
 public class MutinyUni {
-    private final static Logger log = LoggerFactory.getLogger(MutinyUni.class);
+    private static final Logger log = LoggerFactory.getLogger(MutinyUni.class);
 
     public static void main(String[] args) {
+        // Uni is a stream that can represent either an item or a failure
         Uni.createFrom().item("hello").onItem().transform(item -> item + " Mutiny!").onItem()
                 .transform(String::toUpperCase).subscribe().with(item -> log.debug("Item: {}", item));
         Uni.createFrom().item("Ignored due to failure").onItem().castTo(Integer.class).subscribe()
