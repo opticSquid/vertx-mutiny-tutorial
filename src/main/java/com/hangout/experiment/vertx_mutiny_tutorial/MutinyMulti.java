@@ -14,10 +14,11 @@ public class MutinyMulti {
         // Multi represents a stream of elements. It can represent 0, 1, n or an
         // infinite number of items.
         Multi.createFrom().items(IntStream.rangeClosed(0, 10).boxed()).onItem()
-                .transform(value -> value % 2 == 0 ? value / 2 : value * 3 + 1).onItem()
+                .transform(value -> value % 2 == 0 ? value / 0 : value * 3 + 1).onItem()
                 .transform(String::valueOf)
-                // just subscribe to the last 2 entries
-                .select().last(4)
+                // If stream processing fails (in this case it will because division by 0)
+                // In place of crashing the program we will retun "fallback"
+                .onFailure().recoverWithItem("fallback")
                 .subscribe().with(item -> log.info("Item: {}", item));
     }
 }
