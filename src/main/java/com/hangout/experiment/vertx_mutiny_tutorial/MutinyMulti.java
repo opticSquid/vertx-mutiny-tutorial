@@ -16,6 +16,8 @@ public class MutinyMulti {
         Multi.createFrom().items(IntStream.rangeClosed(0, 10).boxed()).onItem()
                 .transform(value -> value % 2 == 0 ? value / 0 : value * 3 + 1).onItem()
                 .transform(String::valueOf)
+                // just subscribe to the last 2 entries
+                .select().last(4)
                 .subscribe().with(item -> log.info("Item: {}", item));
     }
 }
