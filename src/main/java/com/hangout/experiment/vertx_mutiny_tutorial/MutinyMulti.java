@@ -13,12 +13,16 @@ public class MutinyMulti {
     public static void main(String[] args) {
         // Multi represents a stream of elements. It can represent 0, 1, n or an
         // infinite number of items.
-        Multi.createFrom().items(IntStream.rangeClosed(0, 10).boxed()).onItem()
-                .transform(value -> value % 2 == 0 ? value / 0 : value * 3 + 1).onItem()
-                .transform(String::valueOf)
-                // If stream processing fails (in this case it will because division by 0)
-                // In place of crashing the program we will retun "fallback"
-                .onFailure().recoverWithItem("fallback")
-                .subscribe().with(item -> log.info("Item: {}", item));
+        Multi.createFrom().items(IntStream.rangeClosed(0, 10).boxed())
+                .onItem().transform(value -> value % 2 == 0 ? value / 0 : value * 3 + 1)
+                // If stream processing fails in this point (in this case it will because
+                // division by 0)
+                // In place of crashing the program we will run the given lambda callback
+                // function to recover from the error.
+                .onFailure().invoke(failure -> log.debug("Transformation failed because: {}", failure.getMessage()))
+                .onItem().transform(String::valueOf)
+                .subscribe()
+                .with(item -> log.info("Item: {}", item),
+                        failureHandler -> log.error("falied for this reason: {}", failureHandler.getMessage()));
     }
 }
